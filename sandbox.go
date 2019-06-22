@@ -1,10 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"os/exec"
-	"strings"
 )
 
 // // печать аргументов
@@ -21,30 +18,23 @@ import (
 // 	fmt.Printf("Flags arguments command line: %v\n", flag.Args())
 // }
 
-// печать перменных окружения
-func enviromentsPrint() {
-	fmt.Printf("Enviroments:\n")
-	for _, e := range os.Environ() {
-		pair := strings.Split(e, "=")
-		fmt.Printf("Enviroment: %v\n", pair)
-	}
-}
+// // печать перменных окружения
+// func enviromentsPrint() {
+// 	fmt.Printf("Enviroments:\n")
+// 	for _, e := range os.Environ() {
+// 		pair := strings.Split(e, "=")
+// 		fmt.Printf("Enviroment: %v\n", pair)
+// }
 
-func executeCmdRun() {
-	// _, err := exec.Command("sh", "-c", "sudo docker build . -t golang:bug").Output()
-	// if err != nil {
-	// 	fmt.Printf("Error: %v", err)
-	// }
-
-	_, err := exec.Command("sh", "-c", "sudo docker run -it --name=golang-bug golang:bug").Output()
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-	}
-	os.Setenv("flag", "true")
+// запуск контейнера btest
+func executeCmd() {
+	cmd := exec.Command("sh", "-c", "sudo docker run -i --name=btest golang:btest")
+	checkExecuteCmd(*cmd)
 }
 
 func sandBox() {
 	// // чтение и печать аргументов из командной строки
+
 	// argsAll := os.Args
 	// argsPr := argsPrint
 	// argsPr(argsAll)
@@ -53,23 +43,14 @@ func sandBox() {
 	// flagPr := flagsPrint
 	// flagPr(argsAll)
 
-	// установка и печать переменных окружения
+	// // установка и печать переменных окружения
+
 	// os.Setenv("buildEnv", "sudo docker build . -t golang:testSr1")
 	// os.Setenv("runEnv", "sudo docker run -it --name=golangSr1 golang:testSr1")
 	// enviromentsPrint := enviromentsPrint
 	// enviromentsPrint()
 
-	// запуск на сборку билда
+	executeCmd()
 
-	// os.Setenv("path", ".")
-	// os.Setenv("flag", "-t")
-	// os.Setenv("box", "golang:testSr1")
-
-	if os.Getenv("flag") == "flag" {
-		fmt.Printf("It is run, well done flag=%v", os.Getenv("flag"))
-	}
-
-	fmt.Printf("test")
-
-	executeCmdRun()
+	runServer("8081")
 }

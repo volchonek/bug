@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# build container
-sudo docker build . -t golang:bug
-# deploy container
-sudo docker run -it --name=golang-bug golang:bug

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# stop container
-sudo docker stop golang-bug
-# remove container
-sudo docker rm golang-bug
-# remove image container
-sudo docker rmi golang:bug
