@@ -23,7 +23,7 @@ func runServer(port string) {
 		Handler: mux,
 	}
 
-	fmt.Println("starting server at: ", port)
+	fmt.Println("starting server at ", port)
 
 	server.ListenAndServe()
 }
