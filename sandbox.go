@@ -29,12 +29,12 @@ import (
 // запуск контейнера btest
 func executeCmd() {
 	// // собираем образ
-	// cmd := exec.Command("sh", "-c", "sudo docker build ~/go_projects/src/btest golang:btest")
-	// checkExecuteCmd(*cmd)
+	cmdbuild := exec.Command("sh", "-c", "sudo docker build ~/go_projects/src/btest -t golang:btest")
+	checkExecuteCmd(*cmdbuild)
 
 	// разворачиваем образ
-	cmd := exec.Command("sh", "-c", "sudo docker run --rm -i --name=btest -p 4444:8082 golang:btest")
-	checkExecuteCmd(*cmd)
+	cmdrun := exec.Command("sh", "-c", "sudo docker run --rm -i --name=btest -p 4444:8082 golang:btest")
+	checkExecuteCmd(*cmdrun)
 }
 
 func sandBox() {
@@ -55,9 +55,9 @@ func sandBox() {
 	// enviromentsPrint := enviromentsPrint
 	// enviromentsPrint()
 
-	// запускаем сервис для получения информации по контейнерам
-	runServer(":8081")
-
 	// запуск контейра с тестами
 	executeCmd()
+
+	// запускаем сервис для получения информации по контейнерам
+	runServer(":8081")
 }

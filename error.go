@@ -15,8 +15,9 @@ type stackTracer interface {
 func checkExecuteCmd(cmd exec.Cmd) {
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		printError(out, err)
-		printStackError(err)
+		fmt.Println(fmt.Sprint(err) + ": " + string(out))
+		//printError(err, out)
+		//printStackError(err)
 	} else {
 		fmt.Println(string(out))
 	}
