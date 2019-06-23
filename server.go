@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+func ping(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "pong") // заменить на реальный ответ от btest
+}
+
 func runServer(port string) {
 	mux := http.NewServeMux()
 
@@ -13,10 +17,7 @@ func runServer(port string) {
 			fmt.Fprintln(w, "port: ", port, "\nurl: ", r.URL.String())
 		})
 
-	mux.HandleFunc("/pong",
-		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintln(w, "pong")
-		})
+	mux.HandleFunc("/ping", ping)
 
 	server := http.Server{
 		Addr:    port,
