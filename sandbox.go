@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os/exec"
 )
 
@@ -32,9 +33,9 @@ func executeCmd() {
 	cmdbuild := exec.Command("sh", "-c", "sudo docker build ~/go_projects/src/btest -t golang:btest")
 	checkExecuteCmd(*cmdbuild)
 
-	// разворачиваем образ
-	cmdrun := exec.Command("sh", "-c", "sudo docker run --rm -i --name=btest -p 4444:8082 golang:btest")
-	checkExecuteCmd(*cmdrun)
+	// параллельно разворачиваем образ в отдельной горутине, избегаем блокировку в основном потоке
+	cmdrun := exec.Command("sh", "-c", "sudo docker run --rm -i --name=btest -p 8082:80 golang:btest")
+	go checkExecuteCmd(*cmdrun)
 }
 
 func sandBox() {
@@ -57,6 +58,8 @@ func sandBox() {
 
 	// запуск контейра с тестами
 	executeCmd()
+
+	fmt.Println("Desctop is run!!!")
 
 	// запускаем сервис для получения информации по контейнерам
 	runServer(":8081")

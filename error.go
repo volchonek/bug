@@ -16,8 +16,6 @@ func checkExecuteCmd(cmd exec.Cmd) {
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + string(out))
-		//printError(err, out)
-		//printStackError(err)
 	} else {
 		fmt.Println(string(out))
 	}
