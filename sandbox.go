@@ -33,12 +33,21 @@ const (
 // 		fmt.Printf("Enviroment: %v\n", pair)
 // }
 
-// worker для выполнения команды, где cmd команда для исполнения
-func worker(cmd chan string, wg *sync.WaitGroup) {
+// workerBuild для выполнения команды на сбор образа, где cmd команда для исполнения
+func workerBuild(cmd chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	cmdExec := <-cmd
 	cmdrun := exec.Command("sh", "-c", cmdExec)
 	checkExecuteCmd(*cmdrun)
+	runtime.Gosched()
+}
+
+// workerRun для выполнения команды на запуск контейнера, где cmd команда для исполнения
+func workerRun(cmd chan string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	cmdExec := <-cmd
+	cmdRun := exec.Command("sh", "-c", cmdExec)
+	checkExecuteCmd(*cmdRun)
 	runtime.Gosched()
 }
 
@@ -48,15 +57,24 @@ func executeCmd() {
 	// cmdbuild := exec.Command("sh", "-c", "sudo docker build ~/go_projects/src/btest -t golang:btest")
 	// checkExecuteCmd(*cmdbuild)
 
-	// параллельно разворачиваем образ(ы) в отдельной(ых) горутине(ах), избегаем блокировку в основном потоке
-	cmd := make(chan string, 1)
-	cmd <- "sudo docker run --rm -i --name=btest -p 8082:80 golang:btest"
-	wg := &sync.WaitGroup{}
+	cmdBuildCh := make(chan string, 1)
+	cmdBuildCh <- "sudo docker build ~/go_projects/src/btest -t golang:btest"
+	wgBuild := &sync.WaitGroup{}
 	for i := 0; i < gorutinesNum; i++ {
-		wg.Add(1)
-		go worker(cmd, wg)
+		wgBuild.Add(1)
+		go workerBuild(cmdBuildCh, wgBuild)
 	}
-	close(cmd)
+	close(cmdBuildCh)
+
+	// параллельно разворачиваем образ(ы) в отдельной(ых) горутине(ах), избегаем блокировку в основном потоке
+	cmdRunCh := make(chan string, 1)
+	cmdRunCh <- "sudo docker run --rm -i --name=btest -p 8082:80 golang:btest"
+	wgRun := &sync.WaitGroup{}
+	for i := 0; i < gorutinesNum; i++ {
+		wgRun.Add(1)
+		go workerRun(cmdRunCh, wgRun)
+	}
+	close(cmdRunCh)
 }
 
 func sandBox() {
