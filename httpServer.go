@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
+// test request for check test container
 func ping(w http.ResponseWriter, r *http.Request) {
 	url := "http://192.168.11.80:8082/ping?param=ping"
 	resp, err := http.Get(url)
 	if err != nil {
-		//printError(err)
 		fmt.Println(fmt.Sprint(err))
 		return
 	}
@@ -26,7 +26,8 @@ func ping(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("http.Get body %#v\n\n\n", string(respBody))
 }
 
-func runServer(port string) {
+// run http server with set "port"
+func runHttpServer(port string) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/",

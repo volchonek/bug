@@ -1,16 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"os/exec"
-	"runtime"
-	"sync"
-)
-
-const (
-	gorutinesNum = 1
-)
-
 // // печать аргументов
 // func argsPrint(args []string) {
 // 	fmt.Printf("All arguments command line: %v\n", args)
@@ -33,50 +22,6 @@ const (
 // 		fmt.Printf("Enviroment: %v\n", pair)
 // }
 
-// workerBuild для выполнения команды на сбор образа, где cmd команда для исполнения
-func workerBuild(cmd chan string, wg *sync.WaitGroup) {
-	defer wg.Done()
-	cmdExec := <-cmd
-	cmdrun := exec.Command("sh", "-c", cmdExec)
-	checkExecuteCmd(*cmdrun)
-	runtime.Gosched()
-}
-
-// workerRun для выполнения команды на запуск контейнера, где cmd команда для исполнения
-func workerRun(cmd chan string, wg *sync.WaitGroup) {
-	defer wg.Done()
-	cmdExec := <-cmd
-	cmdRun := exec.Command("sh", "-c", cmdExec)
-	checkExecuteCmd(*cmdRun)
-	runtime.Gosched()
-}
-
-// запуск контейнера btest
-func executeCmd() {
-	// собираем образ
-	// cmdbuild := exec.Command("sh", "-c", "sudo docker build ~/go_projects/src/btest -t golang:btest")
-	// checkExecuteCmd(*cmdbuild)
-
-	cmdBuildCh := make(chan string, 1)
-	cmdBuildCh <- "sudo docker build ~/go_projects/src/btest -t golang:btest"
-	wgBuild := &sync.WaitGroup{}
-	for i := 0; i < gorutinesNum; i++ {
-		wgBuild.Add(1)
-		go workerBuild(cmdBuildCh, wgBuild)
-	}
-	close(cmdBuildCh)
-
-	// параллельно разворачиваем образ(ы) в отдельной(ых) горутине(ах), избегаем блокировку в основном потоке
-	cmdRunCh := make(chan string, 1)
-	cmdRunCh <- "sudo docker run --rm -i --name=btest -p 8082:80 golang:btest"
-	wgRun := &sync.WaitGroup{}
-	for i := 0; i < gorutinesNum; i++ {
-		wgRun.Add(1)
-		go workerRun(cmdRunCh, wgRun)
-	}
-	close(cmdRunCh)
-}
-
 func sandBox() {
 	// // чтение и печать аргументов из командной строки
 
@@ -94,12 +39,4 @@ func sandBox() {
 	// os.Setenv("runEnv", "sudo docker run -it --name=golangSr1 golang:testSr1")
 	// enviromentsPrint := enviromentsPrint
 	// enviromentsPrint()
-
-	// запуск контейра с тестами
-	executeCmd()
-
-	fmt.Println("Desctop is run!!!")
-
-	// запускаем сервис для получения информации по контейнерам
-	runServer(":8081")
 }
